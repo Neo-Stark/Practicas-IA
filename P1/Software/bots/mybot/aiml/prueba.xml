@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml version="2.0">
+
+<category>
+   <pattern> PRUEBA </pattern>
+   <template> 
+      <think>
+         <set var="lista"><readset>fruta</readset></set>
+         <set var="elemento_individual">
+         <srai>ITERATE <get var="lista"/> </srai>
+         </set>   
+      </think>
+
+      <condition var="elemento_individual">
+         <li vaule="end">HEMOS LLEGADO AL FINAL</li>
+         <li> 
+            La fruta actual es <get var="elemento_individual"/>
+            <set var="elemento_individual">
+               <srai>NEXT856</srai></set></li>
+      </condition>
+      </template>
+</category>

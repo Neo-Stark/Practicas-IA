@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml version="2.0">
+<!-- File: utilidades.aiml -->
+<!-- Author: Raul y Rocio -->
+<!-- Last modified: February 17, 2016 -->
+<!--  -->
+
+<category>
+<pattern> deletrea * </pattern>
+<template> <explode> <star/> </explode> </template>
+</category>
+
+<category>
+<pattern> resto * </pattern>
+<template> <rest> <star/> </rest> </template>
+</category>
+
+
+<category>
+<pattern> ponerespacios * </pattern>
+<template> 
+  <think>
+	<set var="palabra"></set>
+	<set var="solucion"></set>
+	<set var="tmp"><rest><input/></rest></set>
+	<set var="tmp"> <explode><get var="tmp"/></explode> </set>
+	<set var="caracter"><first><get var="tmp"/></first></set>
+	<set var="tmp"><rest><get var="tmp"/></rest></set>
+	<condition var="caracter">
+		<li value="NIL">
+			<set var="solucion"><get var="solucion"/> <get var="palabra"/></set>
+		</li>
+		<li value="_"> 
+			<set var="solucion"><get var="solucion"/> <get var="palabra"/></set>
+			<set var="palabra"></set>
+			<set var="caracter"><first><get var="tmp"/></first></set>
+			<set var="tmp"><rest><get var="tmp"/></rest></set>
+			<loop/>
+		</li>
+		<li>
+			<set var="palabra"><get var="palabra"/><get var="caracter"/></set>
+			<set var="caracter"><first><get var="tmp"/></first></set>
+			<set var="tmp"><rest><get var="tmp"/></rest></set>
+			<loop/>
+		</li>
+	</condition>
+  </think>
+<get var="solucion"/>
+</template>
+</category>
+
+
+<category>
+<pattern> ponerbarrabaja * </pattern>
+<template> 
+  <think>
+	<set var="tmp"><rest><input/></rest></set>
+	<set var="solucion"><first><get var="tmp"/></first></set>
+	<set var="tmp"><rest><get var="tmp"/></rest></set>
+	<condition var="tmp">
+		<li value="NIL">
+		</li>
+		<li>
+			<set var="solucion"><get var="solucion"/>_<first><get var="tmp"/></first></set>
+			<set var="tmp"><rest><get var="tmp"/></rest></set>
+			<loop/>
+		</li>
+	</condition>
+  </think>
+<get var="solucion"/>
+</template>
+</category>
+
+
+
+</aiml>

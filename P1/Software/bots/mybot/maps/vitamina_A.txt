@@ -1,0 +1,16 @@
+fresa:AN
+manzana:AN
+naranja:AN
+kiwi:AN
+mandarina:AS
+pinia:AN
+mango:AS
+melocoton:AS
+higo:AN
+ciruela:AS
+pera:AN
+platano:AN
+coco:AN
+aguacate:AN
+nuez:AN
+cereza:AS
