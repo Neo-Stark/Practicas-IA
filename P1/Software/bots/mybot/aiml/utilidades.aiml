@@ -248,6 +248,11 @@
 </template>
 </category>
 
+<category>
+<pattern>ITERATE</pattern>
+<template>end</template>
+</category>
+
 
 <!-- Regla que permite iterar sobre las distintas palabras de una frase (esta asociado con ITERATE)-->
 <category>
