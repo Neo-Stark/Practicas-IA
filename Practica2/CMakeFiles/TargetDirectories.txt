@@ -1,0 +1,9 @@
+/media/fran/windows/Users/fjose/Google Drive/Universidad/IA/Practicas/Practica2/CMakeFiles/BelkanSG.dir
+/media/fran/windows/Users/fjose/Google Drive/Universidad/IA/Practicas/Practica2/CMakeFiles/Belkan.dir
+/media/fran/windows/Users/fjose/Google Drive/Universidad/IA/Practicas/Practica2/CMakeFiles/rebuild_cache.dir
+/media/fran/windows/Users/fjose/Google Drive/Universidad/IA/Practicas/Practica2/CMakeFiles/motorLib.dir
+/media/fran/windows/Users/fjose/Google Drive/Universidad/IA/Practicas/Practica2/CMakeFiles/obj3DLib.dir
+/media/fran/windows/Users/fjose/Google Drive/Universidad/IA/Practicas/Practica2/CMakeFiles/edit_cache.dir
+/media/fran/windows/Users/fjose/Google Drive/Universidad/IA/Practicas/Practica2/CMakeFiles/GLUILib.dir
+/media/fran/windows/Users/fjose/Google Drive/Universidad/IA/Practicas/Practica2/CMakeFiles/modelosBelkanLib.dir
+/media/fran/windows/Users/fjose/Google Drive/Universidad/IA/Practicas/Practica2/CMakeFiles/comportamientosLib.dir
