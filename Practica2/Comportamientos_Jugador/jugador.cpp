@@ -266,7 +266,7 @@ Action ComportamientoJugador::think(Sensores sensores) {
         destino.fila = sensores.destinoF;
         destino.columna = sensores.destinoC;
 
-        cout << "Asigado destino: " << destino.fila << ' ' << destino.columna
+        cout << "Nuevo destino: " << destino.fila << ' ' << destino.columna
              << endl;
 
         if (actual_valida) {
@@ -285,9 +285,9 @@ Action ComportamientoJugador::think(Sensores sensores) {
         obstaculo = true;
       }
 
-    PintaPlan(plan);
     // Ejecutar el plan
       if (hayPlan and plan.size() > 0 and !obstaculo) {
+        PintaPlan(plan);
         VisualizaPlan(actual, plan);
         sigAccion = plan.front();
         plan.erase(plan.begin());
