@@ -63,6 +63,10 @@ bool ComportamientoJugador::pathFinding(const estado &origen,
         estado sig;
         if (!camino.empty()) sig = camino.top();
         if (paso.orientacion != sig.orientacion) {
+          if(abs(paso.orientacion - sig.orientacion) == 2){
+            plan.push_back(actTURN_L);
+            plan.push_back(actTURN_L);
+          }else{
           bool direccion = false;  // izquierda = true / derecha = false
           switch (paso.orientacion) {
             case 0:
@@ -77,11 +81,12 @@ bool ComportamientoJugador::pathFinding(const estado &origen,
             case 3:
               if (sig.orientacion == 2) direccion = true;
               break;
-          }
           if (direccion)
             plan.push_back(actTURN_L);
           else
             plan.push_back(actTURN_R);
+          }
+          }
         }
         plan.push_back(actFORWARD);
       }

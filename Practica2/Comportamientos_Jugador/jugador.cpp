@@ -175,6 +175,8 @@ Action ComportamientoJugador::think(Sensores sensores) {
   static const int POS_POR_DEFECTO = TAM_MAPA / 2;
   static bool pk_encontrado = false;
   static bool alcanzando_pk = false;
+  Action sigAccion;
+  bool obstaculo = false;
   cout << "*************SENSORES***********\n" 
   << sensores.mensajeF << '\t' << sensores.mensajeC << endl;
   cout << "*************ACTUAL***********\n"
@@ -270,7 +272,6 @@ Action ComportamientoJugador::think(Sensores sensores) {
         if (actual_valida) {
           plan.clear();
           pathFinding(actual, destino, plan);
-          VisualizaPlan(actual, plan);
         }
       }
     //Posicion actual del personaje
@@ -280,12 +281,14 @@ Action ComportamientoJugador::think(Sensores sensores) {
     // Si nos encontramos con un aldeano nos quedamos quietos hasta que se
     // vaya
       if (superficie[2] == 'a') {
-        return actIDLE;
+        sigAccion = actIDLE;
+        obstaculo = true;
       }
 
+    PintaPlan(plan);
     // Ejecutar el plan
-      Action sigAccion;
-      if (hayPlan and plan.size() > 0) {
+      if (hayPlan and plan.size() > 0 and !obstaculo) {
+        VisualizaPlan(actual, plan);
         sigAccion = plan.front();
         plan.erase(plan.begin());
       } else {
