@@ -156,7 +156,7 @@ list<Action> ComportamientoJugador::generar_plan_aleatorio() const {
   estado d;
   srand(time(NULL));
 
-  while(!celda_valida(d.fila, d.columna) || celda_permitida(d.fila, d.columna)) {
+  while(!celda_valida(d.fila, d.columna) || !celda_permitida(d.fila, d.columna)) {
     d.fila = rand() % TAM_MAPA;
     d.columna = rand() % TAM_MAPA;
   }
@@ -168,17 +168,22 @@ list<Action> ComportamientoJugador::generar_plan_aleatorio() const {
 
 void ComportamientoJugador::recalcular_plan() {
    plan.clear();
-   pathFinding(actual, destino, plan);
+   hayPlan = pathFinding(actual, destino, plan);
 }
 
 Action ComportamientoJugador::think(Sensores sensores) {
-  static const int POS_POR_DEFECTO = TAM_MAPA / 2;
+  // static const int POS_POR_DEFECTO = TAM_MAPA / 2;
   static bool pk_encontrado = false;
   static bool alcanzando_pk = false;
-  Action sigAccion;
+  static bool actual_valida = false;
+  Action sigAccion = actIDLE;
   bool obstaculo = false;
   cout << "*************SENSORES***********\n" 
   << sensores.mensajeF << '\t' << sensores.mensajeC << endl;
+  cout << "*************DESTINO-SENSOR***********\n" 
+  << sensores.destinoF << '\t' << sensores.destinoC << endl;
+  cout << "*************DESTINO***********\n" 
+  << destino.fila << '\t' << destino.columna << endl;
   cout << "*************ACTUAL***********\n"
   << actual.fila << '\t' << actual.columna << endl; 
   
@@ -209,70 +214,100 @@ Action ComportamientoJugador::think(Sensores sensores) {
       }
   }
 
-      bool actual_valida = celda_valida(actual.fila, actual.columna);
       auto terreno = sensores.terreno;
       auto superficie = sensores.superficie;
 
       // reconstruir_terreno(terreno);
 
-      // Inicializar estado actual.
-      if (celda_valida(sensores.mensajeF, sensores.mensajeC) &&
-          actual_valida == false) {
+    // Inicializar estado actual.
+      if (sensores.mensajeF != -1) {
         actual.fila = sensores.mensajeF;
         actual.columna = sensores.mensajeC;
         actual_valida = true;
-        pk_encontrado = true;
-      } 
-      //MAL no se puede poner asignar una posicion aleatoria
-      else if (actual_valida == false) {
-        actual.fila = POS_POR_DEFECTO;
-        actual.columna = POS_POR_DEFECTO;
-      }
-
-      // Busca el Punto de Referencia
-      if (pk_encontrado == false) {
+      }else if(!pk_encontrado && !actual_valida){    //No tenemos una posicion de inicio valida --> Buscamos PK
         if (terreno[0] == 'K') {
           actual_valida = true;
           pk_encontrado = true;
           alcanzando_pk = false;
           actual.fila = sensores.mensajeF;
           actual.columna = sensores.mensajeC;
-          proyectar_mapa_temporal(POS_POR_DEFECTO, POS_POR_DEFECTO, actual.fila,
-                                  actual.columna);
-          cout << "Punto de referencia encontrado: " << sensores.mensajeF << " "
-               << sensores.mensajeC << endl;
-        } else {
-          auto pk = std::find(terreno.begin(), terreno.end(), 'K');
-          if (!alcanzando_pk && pk != terreno.end()) {
-            int pk_index = pk - terreno.begin();
-            auto pk_pos = proyectar_vector(actual.orientacion, pk_index);
-            destino.fila = pk_pos.first;
-            destino.columna = pk_pos.second;
-            plan.clear();
-            pathFinding(actual, destino, plan);
-            cout << "Generando camino hasta PK: " << pk_index << ' '
-                 << destino.fila << ' ' << destino.columna << ' ' << plan.size()
-                 << endl;
-            alcanzando_pk = true;
-          } else if (plan.empty())
-            plan = generar_plan_aleatorio();
+        } else{
+          srand(time(NULL));
+          if(celda_permitida(terreno[2])) sigAccion = actFORWARD;
+          else {
+            int accion = rand() % 2;
+            if (accion) sigAccion = actTURN_L;
+            else sigAccion = actTURN_R;
+          }
         }
       }
 
+      actual_valida = celda_valida(actual.fila, actual.columna);
+    // if (celda_valida(sensores.mensajeF, sensores.mensajeC) &&
+      //     actual_valida == false) {
+      //   actual.fila = sensores.mensajeF;
+      //   actual.columna = sensores.mensajeC;
+      //   actual_valida = true;
+      //   pk_encontrado = true;
+      // } 
+      // //MAL no se puede poner asignar una posicion aleatoria
+      // else if (actual_valida == false) {
+      //   actual.fila = POS_POR_DEFECTO;
+      //   actual.columna = POS_POR_DEFECTO;
+      // }
+
+      // Busca el Punto de Referencia
+      // if (pk_encontrado == false) {
+      //   if (terreno[0] == 'K') {
+      //     actual_valida = true;
+      //     pk_encontrado = true;
+      //     alcanzando_pk = false;
+      //     actual.fila = sensores.mensajeF;
+      //     actual.columna = sensores.mensajeC;
+      //     proyectar_mapa_temporal(POS_POR_DEFECTO, POS_POR_DEFECTO, actual.fila,
+      //                             actual.columna);
+      //     cout << "Punto de referencia encontrado: " << sensores.mensajeF << " "
+      //          << sensores.mensajeC << endl;
+      //   } else {
+      //     auto pk = std::find(terreno.begin(), terreno.end(), 'K');
+      //     if (!alcanzando_pk && pk != terreno.end()) {
+      //       int pk_index = pk - terreno.begin();
+      //       auto pk_pos = proyectar_vector(actual.orientacion, pk_index);
+      //       destino.fila = pk_pos.first;
+      //       destino.columna = pk_pos.second;
+      //       plan.clear();
+      //       pathFinding(actual, destino, plan);
+      //       cout << "Generando camino hasta PK: " << pk_index << ' '
+      //            << destino.fila << ' ' << destino.columna << ' ' << plan.size()
+      //            << endl;
+      //       alcanzando_pk = true;
+      //     } else if (plan.empty())
+      //       plan = generar_plan_aleatorio();
+      //   }
+      // }
+
     // Si se cambia el objetivo y hay punto de referencia, crear un nuevo
       // plan.
-      if (pk_encontrado && (destino.fila != sensores.destinoF ||
+      if ((pk_encontrado or actual_valida) and (destino.fila != sensores.destinoF or
                             destino.columna != sensores.destinoC)) {
         destino.fila = sensores.destinoF;
         destino.columna = sensores.destinoC;
 
         cout << "Nuevo destino: " << destino.fila << ' ' << destino.columna
              << endl;
-
-        if (actual_valida) {
           plan.clear();
-          pathFinding(actual, destino, plan);
-        }
+          for(auto i =0; i<mapaResultado.size();i++){
+            for(auto j =0; j<mapaResultado.size();j++){
+                char contenido = mapaResultado[i][j];
+                cout << contenido  << " ";
+            }
+            cout << endl;
+          }
+  cout << "*************DESTINO***********\n" 
+  << destino.fila << '\t' << destino.columna << endl;
+  cout << "*************ACTUAL***********\n"
+  << actual.fila << '\t' << actual.columna << endl; 
+          hayPlan = pathFinding(actual, destino, plan);
       }
     //Posicion actual del personaje
       cout << "Posicion: " << actual.fila << ' ' << actual.columna << ' '
@@ -291,8 +326,6 @@ Action ComportamientoJugador::think(Sensores sensores) {
         VisualizaPlan(actual, plan);
         sigAccion = plan.front();
         plan.erase(plan.begin());
-      } else {
-        sigAccion = actIDLE;
       }
 
       ultimaAccion = sigAccion;
@@ -303,12 +336,12 @@ int ComportamientoJugador::interact(Action accion, int valor) { return false; }
 
 bool ComportamientoJugador::celda_permitida(char contenidoCasilla) const {
   return contenidoCasilla == 'S' or contenidoCasilla == 'T' or
-         contenidoCasilla == 'K';
+         contenidoCasilla == 'K' or contenidoCasilla == '?';
 }
 
 bool ComportamientoJugador::celda_permitida(int fila, int columna) const {
   char contenido = mapaResultado[fila][columna];
-  return celda_permitida(contenido);
+  return celda_valida(fila,columna) and celda_permitida(contenido);
 }
 
 bool ComportamientoJugador::celda_valida(int fila, int columna) const {
