@@ -25,8 +25,8 @@ comportamientos/comportamiento.hpp
 /media/fran/windows/Users/fjose/Google Drive/Universidad/IA/Practicas/Practica2/Comportamientos_Jugador/jugador.cpp
 ../Comportamientos_Jugador/jugador.hpp
 /media/fran/windows/Users/fjose/Google Drive/Universidad/IA/Practicas/Practica2/Comportamientos_Jugador/jugador.hpp
-motorlib/util.h
-/media/fran/windows/Users/fjose/Google Drive/Universidad/IA/Practicas/Practica2/Comportamientos_Jugador/motorlib/util.h
+time.h
+-
 algorithm
 -
 cmath
@@ -35,8 +35,8 @@ iostream
 -
 stack
 -
-time.h
--
+motorlib/util.h
+/media/fran/windows/Users/fjose/Google Drive/Universidad/IA/Practicas/Practica2/Comportamientos_Jugador/motorlib/util.h
 
 /media/fran/windows/Users/fjose/Google Drive/Universidad/IA/Practicas/Practica2/Comportamientos_Jugador/jugador.hpp
 comportamientos/comportamiento.hpp

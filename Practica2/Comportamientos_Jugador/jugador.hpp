@@ -50,7 +50,7 @@ class ComportamientoJugador : public Comportamiento {
     destino.fila = -1;
     destino.columna = -1;
     destino.orientacion = -1;
-    mapa_aldeanos = vector<vector<bool>>(size);
+    hayPlan = false;
   }
 
   ComportamientoJugador(vector<vector<unsigned char>> mapaR)
@@ -62,7 +62,7 @@ class ComportamientoJugador : public Comportamiento {
     destino.fila = -1;
     destino.columna = -1;
     destino.orientacion = -1;
-    mapa_aldeanos = vector<vector<bool>>(100, vector<bool>(100, false));
+    hayPlan = false;
   }
 
   ComportamientoJugador(const ComportamientoJugador &comport)
@@ -77,11 +77,10 @@ class ComportamientoJugador : public Comportamiento {
  private:
   int fil, col, brujula;
   estado destino, actual;
-  vector<vector<bool>> mapa_aldeanos;
   list<Action> plan;
   const int TAM_MAPA;
   Action ultimaAccion;
-  bool hayPlan;
+  bool hayPlan =false;
 
   void PintaPlan(list<Action> plan);
   bool pathFinding(const estado &origen, const estado &destino,
@@ -141,6 +140,7 @@ class ComportamientoJugador : public Comportamiento {
    * Añade los datos del sensor al mapa
    */
   void reconstruir_terreno(vector<unsigned char> terreno);
+  void pinta_mapa(vector<unsigned char> terreno);
 
   /*
    * Genera un plan cuyo origen es el del jugador actual y un destino
