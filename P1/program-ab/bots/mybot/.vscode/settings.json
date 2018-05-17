@@ -1,6 +1,0 @@
-{
-   "files.associations": {
-      "*.aiml": "xml",
-      "iostream": "cpp"
-   }
-}

@@ -41,8 +41,7 @@ struct estado {
 
 class ComportamientoJugador : public Comportamiento {
  public:
-  ComportamientoJugador(unsigned int size)
-      : Comportamiento(size), TAM_MAPA(size) {
+  ComportamientoJugador(unsigned int size) : Comportamiento(size) {
     // Inicializar Variables de Estado
     fil = col = 99;
     brujula = 0;  // 0: Norte, 1:Este, 2:Sur, 3:Oeste
@@ -54,7 +53,7 @@ class ComportamientoJugador : public Comportamiento {
   }
 
   ComportamientoJugador(vector<vector<unsigned char>> mapaR)
-      : Comportamiento(mapaR), TAM_MAPA(mapaR.size()) {
+      : Comportamiento(mapaR) {
     // Inicializar Variables de Estado
     fil = col = 99;
     brujula = 0;  // 0: Norte, 1:Este, 2:Sur, 3:Oeste
@@ -66,7 +65,7 @@ class ComportamientoJugador : public Comportamiento {
   }
 
   ComportamientoJugador(const ComportamientoJugador &comport)
-      : Comportamiento(comport), TAM_MAPA(comport.TAM_MAPA) {}
+      : Comportamiento(comport) {}
 
   ~ComportamientoJugador() {}
   Action think(Sensores sensores);
@@ -78,75 +77,26 @@ class ComportamientoJugador : public Comportamiento {
   int fil, col, brujula;
   estado destino, actual;
   list<Action> plan;
-  const int TAM_MAPA;
   Action ultimaAccion;
-  bool hayPlan =false;
+  bool hayPlan = false;
 
   void PintaPlan(list<Action> plan);
   bool pathFinding(const estado &origen, const estado &destino,
                    list<Action> &plan) const;
 
-  /*
-   * Devuelve la sucesion optima de estados (celdas) desde el origen hasta el
-   * destino
-   */
   list<estado> busqueda_a_estrella(const estado &origen,
-                                const estado &destino) const;
-  /*
-   * Devuelve true si la celda se encuentra dentro de los limites del mapa
-   */
+                                   const estado &destino) const;
   bool celda_valida(int fila, int columna) const;
 
-  /*
-   * Devuelve true si la celda no es transitable.
-   */
   bool celda_permitida(int fila, int columna) const;
 
-  /*
-   * Devuelve true si la celda no es transitable (por contenido).
-   */
-  bool celda_permitida(char contenido) const;
+  bool celda_permitida(char) const;
 
-  /*
-   * Devuelve la posicion resultante si se avanzase una casilla
-   * dependiendo de la orientacion de la entidad
-   */
-  pair<int, int> orientacion_a_movimiento(int orientacion, int fila,
-                                          int columna) const;
+  pair<int, int> obtener_celda(int orientacion, int pos) const;
 
-  /*
-   * Devuelve el estado resultado de aplicar la accion a e.
-   */
-  estado aplicar_accion(const estado &e, Action a) const;
-
-  /*
-   * Devuelve la posicion real de una celda de
-   * los sensores del jugador.
-   */
-  pair<int, int> proyectar_vector(int orientacion, int pos) const;
-
-  /*
-   * Resetea la matriz de aldeanos
-   */
-  void limpiar_matriz_aldeanos();
-
-  /*
-   * Translada el contenido del mapa para ajustarlo a la posicion real
-   */
-  void proyectar_mapa_temporal(int fila_inicial, int columna_inicial,
-                               int fila_actual, int columna_actual);
-
-  /*
-   * Añade los datos del sensor al mapa
-   */
-  void reconstruir_terreno(vector<unsigned char> terreno);
+  void reconstruir_mapa(vector<unsigned char> terreno);
   void pinta_mapa(vector<unsigned char> terreno);
-
-  /*
-   * Genera un plan cuyo origen es el del jugador actual y un destino
-   * aleatorio.
-   */
-  list<Action> generar_plan_aleatorio() const;
   void recalcular_plan();
+  list<Action> llegar_PK(int pos);
 };
 #endif
