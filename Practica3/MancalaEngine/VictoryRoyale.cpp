@@ -9,6 +9,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <set>
 #include <string>
 using namespace std;
 
@@ -35,74 +36,91 @@ vector<Move> GenerateMoveList(const GameState &state) {
   return moves;
 }
 
-int MaxMove(const GameState &state, Move &bestMove, int nivel) {
-  if (state.isFinalState()) {
-    return state.getScore(state.getCurrentPlayer());
+set<int> listaS;
+int VictoryRoyale::MaxMove(const GameState &state, Move &bestMove, int nivel,
+                           int alpha, int beta) {
+  if (state.isFinalState() || nivel == 0) {
+    int semillas = state.getScore(jugador);
+    return semillas;
   }
+
   vector<Move> moveList = GenerateMoveList(state);
   int nMoves = moveList.size();
   int v = -1000;
+
   for (int i = 0; i < nMoves; i++) {
     Move move = moveList[i];
-    state.simulateMove(move);
+    GameState tmp_state = state.simulateMove(move);
     Move opponentsBestMove;
-    int Rating = MinMove(state, opponentsBestMove, ++nivel);
-    if (Rating > v) {
-      v = Rating;
+    int alpha = MinMove(tmp_state, opponentsBestMove, nivel - 1, alpha, beta);
+    if (alpha > v) {
+      v = alpha;
       bestMove = move;
     }
+    if (beta >= alpha) break;
   }
   return v;
 }
-int MinMove(const GameState &state, Move &bestMove, int nivel) {
-  if (state.isFinalState() || nivel == 6) {
-    return state.getScore(state.getCurrentPlayer());
+int VictoryRoyale::MinMove(const GameState &state, Move &bestMove, int nivel,
+                           int alpha, int beta) {
+  if (state.isFinalState() || nivel == 0) {
+    int semillas = state.getScore(jugador);
+    return semillas;
   }
+
   vector<Move> moveList = GenerateMoveList(state);
   int nMoves = moveList.size();
   int v = 1000;
+
   for (int i = 0; i < nMoves; i++) {
     Move move = moveList[i];
-    state.simulateMove(move);
+    GameState tmp_state = state.simulateMove(move);
     Move opponentsBestMove;
-    int Rating = MaxMove(state, opponentsBestMove, ++nivel);
-    if (Rating < v) {
-      v = Rating;
+    alpha = MaxMove(tmp_state, opponentsBestMove, nivel - 1, alpha, beta);
+    if (alpha < v) {
+      v = alpha;
       bestMove = move;
     }
+    if (beta >= alpha) break;
   }
   return v;
 }
 
-Move MiniMax(const GameState &state) {
-  Move bestMove;
-  int i = 0;
-  if (state.getCurrentPlayer() == (Player)1) {
-    i = MaxMove(state, bestMove, 0);
-  } else {
-    i = MinMove(state, bestMove, 0);
-  }
+Move VictoryRoyale::MiniMax(const GameState &state, int alpha, int beta) {
+  // Movimiento aleatorio
+  srand(time(0));
+  vector<Move> list = GenerateMoveList(state);
+  int i = rand() % list.size();
+  Move bestMove = list[i];
+
+  MaxMove(state, bestMove, 9, alpha, beta);
+
   return bestMove;
 }
 
 Move VictoryRoyale::nextMove(const vector<Move> &adversary,
                              const GameState &state) {
   Move movimiento = M_NONE;
-  Player turno = state.getCurrentPlayer();
-  Player rival = turno == J1 ? J2 : J1;
+  jugador = state.getCurrentPlayer();
+  rival = jugador == J1 ? J2 : J1;
+  int alpha = -1000;
+  int beta = 1000;
 
   // Si es el primer movimiento de la partida siempre sembramos la primera
   // casilla
   static bool primerTurno = true;
   if (rival == J2 and primerTurno)
     for (int i = 1; i < 7; i++)
-      if (state.getSeedsAt(rival, (Position)i) != 4) primerTurno = false;
-
-  int puntos = -10000;
-
-	
-	
-  if (primerTurno) movimiento = (Move)1;
+      if (state.getSeedsAt(rival, (Position)i) != 4)
+        primerTurno = false;
+      else if (rival == J1)
+        primerTurno = false;
+  if (primerTurno) {
+    movimiento = (Move)1;
+    primerTurno = false;
+  } else {
+    movimiento = MiniMax(state, alpha, beta);
+  }
 
   return movimiento;
 }
