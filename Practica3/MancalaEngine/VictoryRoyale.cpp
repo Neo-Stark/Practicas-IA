@@ -13,9 +13,7 @@
 #include <string>
 using namespace std;
 
-VictoryRoyale::VictoryRoyale() {
-  // Inicializar las variables necesarias para ejecutar la partida
-}
+VictoryRoyale::VictoryRoyale() : depth(10) {}
 
 VictoryRoyale::~VictoryRoyale() {
   // Liberar los recursos reservados (memoria, ficheros, etc.)
@@ -36,66 +34,50 @@ vector<Move> GenerateMoveList(const GameState &state) {
   return moves;
 }
 
-set<int> listaS;
-int VictoryRoyale::MaxMove(const GameState &state, Move &bestMove, int nivel,
-                           int alpha, int beta) {
-  if (state.isFinalState() || nivel == 0) {
-    int semillas = state.getScore(jugador);
-    return semillas;
-  }
-
-  vector<Move> moveList = GenerateMoveList(state);
-  int nMoves = moveList.size();
-  int v = -1000;
-
-  for (int i = 0; i < nMoves; i++) {
-    Move move = moveList[i];
-    GameState tmp_state = state.simulateMove(move);
-    Move opponentsBestMove;
-    int alpha = MinMove(tmp_state, opponentsBestMove, nivel - 1, alpha, beta);
-    if (alpha > v) {
-      v = alpha;
-      bestMove = move;
-    }
-    if (beta >= alpha) break;
-  }
-  return v;
-}
-int VictoryRoyale::MinMove(const GameState &state, Move &bestMove, int nivel,
-                           int alpha, int beta) {
-  if (state.isFinalState() || nivel == 0) {
-    int semillas = state.getScore(jugador);
-    return semillas;
-  }
-
-  vector<Move> moveList = GenerateMoveList(state);
-  int nMoves = moveList.size();
-  int v = 1000;
-
-  for (int i = 0; i < nMoves; i++) {
-    Move move = moveList[i];
-    GameState tmp_state = state.simulateMove(move);
-    Move opponentsBestMove;
-    alpha = MaxMove(tmp_state, opponentsBestMove, nivel - 1, alpha, beta);
-    if (alpha < v) {
-      v = alpha;
-      bestMove = move;
-    }
-    if (beta >= alpha) break;
-  }
-  return v;
+int VictoryRoyale::heuristica(const GameState &state) {
+  int score;
+  if (jugador == J1)
+    score = state.getScore((Player)0) - state.getScore((Player)1);
+  else
+    score = state.getScore((Player)1) - state.getScore((Player)0);
+  return score;
 }
 
-Move VictoryRoyale::MiniMax(const GameState &state, int alpha, int beta) {
-  // Movimiento aleatorio
-  srand(time(0));
-  vector<Move> list = GenerateMoveList(state);
-  int i = rand() % list.size();
-  Move bestMove = list[i];
+int VictoryRoyale::MiniMax(const GameState &state, Move &bestMove, int alpha,
+                           int beta, int nivel) {
+  if (state.isFinalState() || nivel == 0) {
+    return heuristica(state);
+  }
+  vector<Move> moveList = GenerateMoveList(state);
+  int nMoves = moveList.size();
+  int value = 1000;
+  Move opponentsBestMove;
 
-  MaxMove(state, bestMove, 9, alpha, beta);
-
-  return bestMove;
+  for (Move move : moveList) {
+    GameState tmp_state = state.simulateMove(move);
+    value = MiniMax(tmp_state, opponentsBestMove, alpha, beta, nivel - 1);
+    if (state.getCurrentPlayer() == jugador) {
+      if (alpha < value) {
+        alpha = value;
+        bestMove = move;
+      }
+      if (beta <= alpha) {
+        break;
+      }
+    } else if (state.getCurrentPlayer() == rival) {
+      if (beta > value) {
+        beta = value;
+        bestMove = move;
+      }
+      if (beta <= alpha) {
+        break;
+      }
+    }
+  }
+  if (state.getCurrentPlayer() == jugador)
+    return alpha;
+  else
+    return beta;
 }
 
 Move VictoryRoyale::nextMove(const vector<Move> &adversary,
@@ -105,6 +87,12 @@ Move VictoryRoyale::nextMove(const vector<Move> &adversary,
   rival = jugador == J1 ? J2 : J1;
   int alpha = -1000;
   int beta = 1000;
+
+  // Aleatorio
+  vector<Move> list = GenerateMoveList(state);
+  srand(time(0));
+  int i = rand() % list.size();
+  movimiento = list[i];
 
   // Si es el primer movimiento de la partida siempre sembramos la primera
   // casilla
@@ -119,7 +107,7 @@ Move VictoryRoyale::nextMove(const vector<Move> &adversary,
     movimiento = (Move)1;
     primerTurno = false;
   } else {
-    movimiento = MiniMax(state, alpha, beta);
+    MiniMax(state, movimiento, alpha, beta, depth);
   }
 
   return movimiento;

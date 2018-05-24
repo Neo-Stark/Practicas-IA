@@ -1,6 +1,6 @@
 
 all:
-	g++ -o VictoryRoyale *.cpp -I./ -lm -std=c++11 -O3
+	g++ -o VictoryRoyale *.cpp -I./ -lm -std=c++11
 
 
 clean:

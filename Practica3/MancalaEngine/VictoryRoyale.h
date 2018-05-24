@@ -19,11 +19,11 @@ class VictoryRoyale : Bot {
   void initialize();
   string getName();
   Move nextMove(const vector<Move> &adversary, const GameState &state);
-  int MaxMove(const GameState &state, Move &bestMove, int nivel, int alpha,
-              int beta);
-  int MinMove(const GameState &state, Move &bestMove, int nivel, int alpha,
-              int beta);
-  Move MiniMax(const GameState &state, int alpha, int beta);
+  int MiniMax(const GameState &state, Move &bestMove, int alpha, int beta,
+              int nivel);
+  int heuristica(const GameState &estado);
+ private:
+  unsigned int depth;
 };
 
 #endif /* MANUPCBOT_H_ */

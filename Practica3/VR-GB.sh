@@ -1,0 +1,1 @@
+java -jar MancalaNoGUI.jar -p1 ./MancalaEngine/VictoryRoyale -p2 ./GreedyBot/GreedyBot
