@@ -13,7 +13,7 @@
 #include <string>
 using namespace std;
 
-VictoryRoyale::VictoryRoyale() : depth(10) {}
+VictoryRoyale::VictoryRoyale() : depth(13) {}
 
 VictoryRoyale::~VictoryRoyale() {
   // Liberar los recursos reservados (memoria, ficheros, etc.)
@@ -42,15 +42,15 @@ int VictoryRoyale::heuristica(const GameState &state) {
     score = state.getScore((Player)1) - state.getScore((Player)0);
   return score;
 }
-
 int VictoryRoyale::MiniMax(const GameState &state, Move &bestMove, int alpha,
                            int beta, int nivel) {
   if (state.isFinalState() || nivel == 0) {
     return heuristica(state);
   }
+
   vector<Move> moveList = GenerateMoveList(state);
   int nMoves = moveList.size();
-  int value = 1000;
+  int value = 0;
   Move opponentsBestMove;
 
   for (Move move : moveList) {
@@ -59,19 +59,15 @@ int VictoryRoyale::MiniMax(const GameState &state, Move &bestMove, int alpha,
     if (state.getCurrentPlayer() == jugador) {
       if (alpha < value) {
         alpha = value;
-        bestMove = move;
-      }
-      if (beta <= alpha) {
-        break;
+        if (nivel == depth) bestMove = move;
       }
     } else if (state.getCurrentPlayer() == rival) {
       if (beta > value) {
         beta = value;
-        bestMove = move;
       }
-      if (beta <= alpha) {
-        break;
-      }
+    }
+    if (beta <= alpha) {
+      break;
     }
   }
   if (state.getCurrentPlayer() == jugador)

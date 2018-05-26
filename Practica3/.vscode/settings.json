@@ -6,6 +6,7 @@
     "array": "cpp",
     "deque": "cpp",
     "slist": "cpp",
-    "cmath": "cpp"
+    "cmath": "cpp",
+    "*.ipp": "cpp"
   }
 }

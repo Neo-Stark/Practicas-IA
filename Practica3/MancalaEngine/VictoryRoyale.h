@@ -7,8 +7,8 @@
 
 #include "Bot.h"
 
-#ifndef MANUPCBOT_H_
-#define MANUPCBOT_H_
+#ifndef FRANPCBOT_H_
+#define FRANPCBOT_H_
 
 class VictoryRoyale : Bot {
  public:
@@ -26,4 +26,4 @@ class VictoryRoyale : Bot {
   unsigned int depth;
 };
 
-#endif /* MANUPCBOT_H_ */
+#endif /* FRANPCBOT_H_ */
