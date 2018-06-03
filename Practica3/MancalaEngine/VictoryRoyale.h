@@ -14,7 +14,6 @@ class VictoryRoyale : Bot {
  public:
   VictoryRoyale();
   ~VictoryRoyale();
-  Player jugador, rival;
 
   void initialize();
   string getName();
@@ -23,10 +22,11 @@ class VictoryRoyale : Bot {
                  double beta, int nivel);
   double heuristica(const GameState &);
   int movimientosPosibles(const GameState &, Player);
-  int piedrasTotal(const GameState &, Player);
+  int semillasTotal(const GameState &, Player);
   int casillasLibres(const GameState &, Player);
 
  private:
+  Player jugador, rival;
   unsigned int depth;
 };
 

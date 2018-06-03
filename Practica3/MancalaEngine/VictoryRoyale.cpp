@@ -13,7 +13,7 @@
 #include <string>
 using namespace std;
 
-VictoryRoyale::VictoryRoyale() : depth(10) {}
+VictoryRoyale::VictoryRoyale() : depth(11) {}
 
 VictoryRoyale::~VictoryRoyale() {}
 
@@ -43,7 +43,7 @@ int VictoryRoyale::casillasLibres(const GameState &state, Player turno) {
   return score - 1;
 }
 
-int VictoryRoyale::piedrasTotal(const GameState &state, Player turno) {
+int VictoryRoyale::semillasTotal(const GameState &state, Player turno) {
   int total = 0;
   for (int i = 1; i <= 6; i++) total += state.getSeedsAt(turno, (Position)i);
 
@@ -52,9 +52,9 @@ int VictoryRoyale::piedrasTotal(const GameState &state, Player turno) {
 
 double VictoryRoyale::heuristica(const GameState &state) {
   double score;
-  score = (state.getScore(jugador) - state.getScore(rival) * 0.5) * 10 / 48;
-  score += movimientosPosibles(state, rival) * 0.4;
-  score += piedrasTotal(state, jugador) * 0.45;
+  score = (state.getScore(jugador) - state.getScore(rival)) * 10 / 48;
+  score += movimientosPosibles(state, rival) * 0.3;
+  score += semillasTotal(state, jugador) * 0.6;
   score += casillasLibres(state, jugador) * 0.2;
   return score;
 }
@@ -95,7 +95,6 @@ double VictoryRoyale::MiniMax(const GameState &state, Move &bestMove,
 
 Move VictoryRoyale::nextMove(const vector<Move> &adversary,
                              const GameState &state) {
-  static unsigned contador = 0;
   Move movimiento = M_NONE;
   static bool inicio = true;
   if (inicio) {
@@ -106,6 +105,5 @@ Move VictoryRoyale::nextMove(const vector<Move> &adversary,
   double beta = 1000;
 
   MiniMax(state, movimiento, alpha, beta, depth);
-  cerr << ++contador << endl;
   return movimiento;
 }
