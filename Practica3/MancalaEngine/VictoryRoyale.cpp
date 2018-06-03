@@ -13,44 +13,61 @@
 #include <string>
 using namespace std;
 
-VictoryRoyale::VictoryRoyale() : depth(13) {}
+VictoryRoyale::VictoryRoyale() : depth(10) {}
 
-VictoryRoyale::~VictoryRoyale() {
-  // Liberar los recursos reservados (memoria, ficheros, etc.)
-}
+VictoryRoyale::~VictoryRoyale() {}
 
 void VictoryRoyale::initialize() {
-  // Inicializar el bot antes de jugar una partida
+  jugador = this->getPlayer();
+  rival = jugador == J1 ? J2 : J1;
 }
 
 string VictoryRoyale::getName() { return "VictoryRoyale"; }
 
-vector<Move> GenerateMoveList(const GameState &state) {
+vector<Move> GenerateMoveList(const GameState &state, Player turno) {
   vector<Move> moves;
   for (int i = 1; i <= 6; i++)
-    if (state.getSeedsAt(state.getCurrentPlayer(), (Position)i) > 0)
-      moves.push_back((Move)i);
+    if (state.getSeedsAt(turno, (Position)i) > 0) moves.push_back((Move)i);
 
   return moves;
 }
 
-int VictoryRoyale::heuristica(const GameState &state) {
-  int score;
-  if (jugador == J1)
-    score = state.getScore((Player)0) - state.getScore((Player)1);
-  else
-    score = state.getScore((Player)1) - state.getScore((Player)0);
+int VictoryRoyale::movimientosPosibles(const GameState &state, Player turno) {
+  return GenerateMoveList(state, turno).size() * 10 / 6;
+}
+
+int VictoryRoyale::casillasLibres(const GameState &state, Player turno) {
+  int score = 0;
+  for (int i = 1; i <= 2; i++)
+    if (state.getSeedsAt(turno, (Position)i) == 0) score += 7 - i;
+  return score - 1;
+}
+
+int VictoryRoyale::piedrasTotal(const GameState &state, Player turno) {
+  int total = 0;
+  for (int i = 1; i <= 6; i++) total += state.getSeedsAt(turno, (Position)i);
+
+  return total * 10 / 40;
+}
+
+double VictoryRoyale::heuristica(const GameState &state) {
+  double score;
+  score = (state.getScore(jugador) - state.getScore(rival) * 0.5) * 10 / 48;
+  score += movimientosPosibles(state, rival) * 0.4;
+  score += piedrasTotal(state, jugador) * 0.45;
+  score += casillasLibres(state, jugador) * 0.2;
   return score;
 }
-int VictoryRoyale::MiniMax(const GameState &state, Move &bestMove, int alpha,
-                           int beta, int nivel) {
+
+double VictoryRoyale::MiniMax(const GameState &state, Move &bestMove,
+                              double alpha, double beta, int nivel) {
   if (state.isFinalState() || nivel == 0) {
     return heuristica(state);
   }
 
-  vector<Move> moveList = GenerateMoveList(state);
+  vector<Move> moveList = GenerateMoveList(state, state.getCurrentPlayer());
   int nMoves = moveList.size();
-  int value = 0;
+  double value = 0;
   Move opponentsBestMove;
 
   for (Move move : moveList) {
@@ -78,33 +95,17 @@ int VictoryRoyale::MiniMax(const GameState &state, Move &bestMove, int alpha,
 
 Move VictoryRoyale::nextMove(const vector<Move> &adversary,
                              const GameState &state) {
+  static unsigned contador = 0;
   Move movimiento = M_NONE;
-  jugador = state.getCurrentPlayer();
-  rival = jugador == J1 ? J2 : J1;
-  int alpha = -1000;
-  int beta = 1000;
-
-  // Aleatorio
-  vector<Move> list = GenerateMoveList(state);
-  srand(time(0));
-  int i = rand() % list.size();
-  movimiento = list[i];
-
-  // Si es el primer movimiento de la partida siempre sembramos la primera
-  // casilla
-  static bool primerTurno = true;
-  if (rival == J2 and primerTurno)
-    for (int i = 1; i < 7; i++)
-      if (state.getSeedsAt(rival, (Position)i) != 4)
-        primerTurno = false;
-      else if (rival == J1)
-        primerTurno = false;
-  if (primerTurno) {
-    movimiento = (Move)1;
-    primerTurno = false;
-  } else {
-    MiniMax(state, movimiento, alpha, beta, depth);
+  static bool inicio = true;
+  if (inicio) {
+    initialize();
+    inicio = false;
   }
+  double alpha = -1000;
+  double beta = 1000;
 
+  MiniMax(state, movimiento, alpha, beta, depth);
+  cerr << ++contador << endl;
   return movimiento;
 }

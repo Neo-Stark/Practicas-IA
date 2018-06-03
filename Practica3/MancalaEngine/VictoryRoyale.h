@@ -19,9 +19,13 @@ class VictoryRoyale : Bot {
   void initialize();
   string getName();
   Move nextMove(const vector<Move> &adversary, const GameState &state);
-  int MiniMax(const GameState &state, Move &bestMove, int alpha, int beta,
-              int nivel);
-  int heuristica(const GameState &estado);
+  double MiniMax(const GameState &state, Move &bestMove, double alpha,
+                 double beta, int nivel);
+  double heuristica(const GameState &);
+  int movimientosPosibles(const GameState &, Player);
+  int piedrasTotal(const GameState &, Player);
+  int casillasLibres(const GameState &, Player);
+
  private:
   unsigned int depth;
 };
